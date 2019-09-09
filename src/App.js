@@ -1,46 +1,68 @@
-import React, { Component } from 'react';
-import Profile from './Profile.js';
-import Signin from './Signin.js';
+import React, { Component, useState, useEffect } from 'react';
+import { connect } from 'react-redux';
+import { configure, User, getConfig } from 'radiks';
 import {
   UserSession,
   AppConfig
 } from 'blockstack';
 
-const appConfig = new AppConfig()
+import { Main, Signin } from './components';
+import { storeUserSession, getCustomUser } from './actions';
+import { List } from './models';
+
+import socialli_config from './socialli_config';
+
+const appConfig = new AppConfig(
+  ["store_write", "publish_data"],
+)
+
 const userSession = new UserSession({ appConfig: appConfig })
 
-export default class App extends Component {
+configure({
+    apiServer: process.env.REACT_APP_SERVER ? process.env.REACT_APP_SERVER : 'http://localhost:5000',
+    userSession
+})
 
+const App = (props) => {
 
-  handleSignIn(e) {
-    e.preventDefault();
-    userSession.redirectToSignIn();
-  }
+    document.title = socialli_config.instance_name;
+    
+    const [userData, setUserData] = useState({});
 
-  handleSignOut(e) {
-    e.preventDefault();
-    userSession.signUserOut(window.location.origin);
-  }
+    props.storeUserSession(userSession);
 
-  render() {
+    useEffect (() => {
+        const isSigninPending = async (userSession) => {
+            let data;
+            if (userSession.isSignInPending()) {
+                await userSession.handlePendingSignIn().then( async (userData) => {
+                    window.history.replaceState({}, document.title, "/")
+                    setUserData(userData);
+                    data = userData;
+                });
+                await User.createWithCurrentUser();
+                props.getCustomUser(data)
+            } else if (userSession.isUserSignedIn()) {
+                data = userSession.loadUserData();
+                props.getCustomUser(data)
+            }
+        }
+        isSigninPending(userSession);
+    }, []);
     return (
-      <div className="site-wrapper">
-        <div className="site-wrapper-inner">
-          { !userSession.isUserSignedIn() ?
-            <Signin userSession={userSession} handleSignIn={ this.handleSignIn } />
-            : <Profile userSession={userSession} handleSignOut={ this.handleSignOut } />
-          }
-        </div>
+      <div>
+        { !userSession.isUserSignedIn() ?
+          <Signin/>
+          : <Main/>
+        }
       </div>
     );
-  }
-
-  componentDidMount() {
-    if (userSession.isSignInPending()) {
-      userSession.handlePendingSignIn().then((userData) => {
-        window.history.replaceState({}, document.title, "/")
-        this.setState({ userData: userData})
-      });
-    }
-  }
 }
+
+const mstp = state => {
+    return {
+        userSession: state.auth.userSession
+    }
+}
+
+export default connect(mstp, {storeUserSession, getCustomUser})(App);

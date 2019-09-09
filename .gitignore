@@ -25,6 +25,7 @@ coverage
 
 # Compiled binary addons (http://nodejs.org/api/addons.html)
 build/Release
+build/
 
 # Dependency directories
 node_modules
@@ -38,3 +39,15 @@ jspm_packages
 
 # Custom
 .DS_Store
+
+# Ignore .swp and .swo files
+*.swp
+*.swo
+
+#ignore notes.md
+notes.md
+
+#ignore .env file
+.env
+
+.vscode

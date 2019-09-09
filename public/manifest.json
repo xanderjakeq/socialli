@@ -1,6 +1,6 @@
 {
-  "name": "AnyList",
-  "description": "Create shareable list about anything.",
+  "name": "Socialli",
+  "description": "Just another social media app. But decentralized.",
   "icons": [
     {
     "src": "favicon.ico",
@@ -9,5 +9,6 @@
     }
   ],
   "start_url": "./index.html",
-  "display": "standalone"
+  "display": "standalone",
+  "did_authors": ["did:stack:v0:SZt9DNCZQb26dBPdt9L4Ng7xZ72ejGUdTP-0"]
 }
