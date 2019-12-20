@@ -1,7 +1,7 @@
 {
-  "name": "anylist",
+  "name": "socialli",
   "version": "0.0.0",
-  "description": "Create shareable list about anything.",
+  "description": "Opensource facebook group alternative.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/blockstack/hello-blockstack.git"
